@@ -75,6 +75,100 @@ module.exports = {
       });
   },
 
+  async UpdateOrsignInWithGoogle(req, res) {
+    const payload  = req.body;
+   
+   const responseFromDB= await userModel
+      .updateMany({ email: req.body.email } , payload, { upsert: true})
+
+      console.log(responseFromDB.upsertedCount)
+      if(responseFromDB.upsertedCount==0){
+        // if means data has been updated
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify(
+            {
+              success: true,
+              msg: payload.email.includes("@gmail.com")? "Welcome "+payload.fullname : " updated successfully"
+            },
+            null,
+            3
+          )
+        );
+      }
+      else if(responseFromDB.upsertedCount==1){
+        // it means new user has been registered
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify(
+              {
+                success: true,
+                msg: payload.email.includes("@gmail.com")? "Welcome "+payload.fullname : " "
+              },
+              null,
+              3
+            )
+          );
+      }
+      else {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify(
+            {
+              success: false,
+              msg: "Something went wrong please try again"
+            },
+            null,
+            3
+          )
+        );
+    }
+      
+      // .then((result) => {
+      //   console.log(result)
+      //   if (result == null) {
+          
+      //     res.writeHead(200, { "Content-Type": "application/json" });
+      //     res.end(
+      //       JSON.stringify(
+      //         {
+      //           success: false,
+      //           msg: "Failed to login",
+      //         },
+      //         null,
+      //         3
+      //       )
+      //     );
+      //   } else {
+      //     res.writeHead(200, { "Content-Type": "application/json" });
+      //   res.end(
+      //     JSON.stringify(
+      //       {
+      //         success: false,
+      //         msg: "Failed to update",
+      //       },
+      //       null,
+      //       3
+      //     )
+      //   );
+      //   }
+      // })
+      // .catch(function (error) {
+      //   res.writeHead(500, { "Content-Type": "application/json" });
+      //   res.end(
+      //     JSON.stringify(
+      //       {
+      //         success: false,
+      //         msg: "Failed to login",
+      //       },
+      //       null,
+      //       3
+      //     )
+      //   );
+      // });
+  },
+
+
   async signUpUser(req, res) {
     const { fullname, email, phonenumber, address, password } = req.body;
     
@@ -135,59 +229,5 @@ module.exports = {
     });
   },
 
-  async registerVaccinationCenter(req, res) {
-    const { name, postCode, streetAddress, description } = req.body;
-
-    vaccinationModel.findOne({ email: email }).then((result) => {
-      if (result == null) {
-        const newVaccinationCenter = new vaccinationModel({
-          name: name,
-          postCode: postCode,
-          streetAddress: streetAddress,
-          description: description,
-        });
-
-        newVaccinationCenter
-          .save()
-          .then(() => {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify(
-                {
-                  success: true,
-                  msg: "Vaccination Center registered successfully",
-                },
-                null,
-                3
-              )
-            );
-          })
-          .catch((e) => {
-            console.log(e);
-            res.end(
-              JSON.stringify(
-                {
-                  success: false,
-                  msg: "Failed to register Vaccination Center",
-                },
-                null,
-                3
-              )
-            );
-          });
-      } else {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(
-          JSON.stringify(
-            {
-              success: false,
-              msg: "Vaccination Center Already Exist",
-            },
-            null,
-            3
-          )
-        );
-      }
-    });
-  },
+  
 };
