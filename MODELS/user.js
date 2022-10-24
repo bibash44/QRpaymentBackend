@@ -16,22 +16,14 @@ const UserSchema = new Schema({
     required: true,
   },
 
-  email: {
+  address: {
     type: String,
-    required: true,
   },
-  dob: {
-    type: String,
-    required: true,
-  },
+
   password: {
     type: String,
-    required: true,
   },
-  usertype: {
-    type: String,
-    required: true,
-  },
+
 });
 
 const user = mongoose.model("User", UserSchema);

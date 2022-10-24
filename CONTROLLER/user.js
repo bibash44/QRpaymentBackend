@@ -1,11 +1,10 @@
 const userModel = require("../MODELS/user");
-const vaccinationModel = require("../MODELS/vaccination");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 module.exports = {
-  async loginUser(req, res) {
+  async signInUser(req, res) {
     const { email, password } = req.body;
     userModel
       .findOne({ email: email })
@@ -76,9 +75,9 @@ module.exports = {
       });
   },
 
-  async registerUser(req, res) {
-    const { fullname, email, phonenumber, dob, password, usertype } = req.body;
-
+  async signUpUser(req, res) {
+    const { fullname, email, phonenumber, address, password } = req.body;
+    
     userModel.findOne({ email: email }).then((result) => {
       if (result == null) {
         bcrypt.hash(password, saltRounds, function (err, hashpassword) {
@@ -87,9 +86,8 @@ module.exports = {
             fullname: fullname,
             email: email,
             phonenumber: phonenumber,
-            dob: dob,
+            address: address,
             password: hashpassword,
-            usertype: usertype,
           });
 
           newuser
