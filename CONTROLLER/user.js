@@ -81,7 +81,6 @@ module.exports = {
    const responseFromDB= await userModel
       .updateMany({ email: req.body.email } , payload, { upsert: true})
 
-      console.log(responseFromDB.upsertedCount)
       if(responseFromDB.upsertedCount==0){
         // if means data has been updated
         res.writeHead(200, { "Content-Type": "application/json" });
@@ -89,7 +88,8 @@ module.exports = {
           JSON.stringify(
             {
               success: true,
-              msg: payload.email.includes("@gmail.com")? "Welcome "+payload.fullname : " updated successfully"
+              msg: payload.email.includes("@gmail.com")? "Welcome "+payload.fullname : " updated successfully",
+              data: payload
             },
             null,
             3
@@ -103,7 +103,8 @@ module.exports = {
             JSON.stringify(
               {
                 success: true,
-                msg: payload.email.includes("@gmail.com")? "Welcome "+payload.fullname : " "
+                msg: payload.email.includes("@gmail.com")? "Welcome "+payload.fullname : " ",
+                data: payload
               },
               null,
               3
@@ -124,48 +125,7 @@ module.exports = {
         );
     }
       
-      // .then((result) => {
-      //   console.log(result)
-      //   if (result == null) {
-          
-      //     res.writeHead(200, { "Content-Type": "application/json" });
-      //     res.end(
-      //       JSON.stringify(
-      //         {
-      //           success: false,
-      //           msg: "Failed to login",
-      //         },
-      //         null,
-      //         3
-      //       )
-      //     );
-      //   } else {
-      //     res.writeHead(200, { "Content-Type": "application/json" });
-      //   res.end(
-      //     JSON.stringify(
-      //       {
-      //         success: false,
-      //         msg: "Failed to update",
-      //       },
-      //       null,
-      //       3
-      //     )
-      //   );
-      //   }
-      // })
-      // .catch(function (error) {
-      //   res.writeHead(500, { "Content-Type": "application/json" });
-      //   res.end(
-      //     JSON.stringify(
-      //       {
-      //         success: false,
-      //         msg: "Failed to login",
-      //       },
-      //       null,
-      //       3
-      //     )
-      //   );
-      // });
+     
   },
 
 
