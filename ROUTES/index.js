@@ -7,7 +7,5 @@ app.get("/", (req, res) => {
 });
 
 app.use('/user', require('./user'))
-app.use('/sendemail', email.sendEmail);
-app.use('/sendsms', sms.sendSms);
 // Routes registeration
 // app.use('/user', require('./user'))

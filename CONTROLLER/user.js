@@ -2,6 +2,7 @@ const userModel = require("../MODELS/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const sendEmail = require('../AUTH/email')
 
 module.exports = {
   async signInUser(req, res) {
@@ -76,62 +77,62 @@ module.exports = {
   },
 
   async UpdateOrsignInWithGoogle(req, res) {
-    const payload  = req.body;
-   
-   const responseFromDB= await userModel
-      .updateMany({ email: req.body.email } , payload, { upsert: true})
+    const payload = req.body;
 
-      if(responseFromDB.upsertedCount==0){
-        // if means data has been updated
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(
-          JSON.stringify(
-            {
-              success: true,
-              msg: payload.email.includes("@gmail.com")? "Welcome "+payload.fullname : " updated successfully",
-              data: payload
-            },
-            null,
-            3
-          )
-        );
-      }
-      else if(responseFromDB.upsertedCount==1){
-        // it means new user has been registered
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(
-            JSON.stringify(
-              {
-                success: true,
-                msg: payload.email.includes("@gmail.com")? "Welcome "+payload.fullname : " ",
-                data: payload
-              },
-              null,
-              3
-            )
-          );
-      }
-      else {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(
-          JSON.stringify(
-            {
-              success: false,
-              msg: "Something went wrong please try again"
-            },
-            null,
-            3
-          )
-        );
+    const responseFromDB = await userModel
+      .updateMany({ email: req.body.email }, payload, { upsert: true })
+
+    if (responseFromDB.upsertedCount == 0) {
+      // if means data has been updated
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify(
+          {
+            success: true,
+            msg: payload.email.includes("@gmail.com") ? "Welcome " + payload.fullname : " updated successfully",
+            data: payload
+          },
+          null,
+          3
+        )
+      );
     }
-      
-     
+    else if (responseFromDB.upsertedCount == 1) {
+      // it means new user has been registered
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify(
+          {
+            success: true,
+            msg: payload.email.includes("@gmail.com") ? "Welcome " + payload.fullname : " ",
+            data: payload
+          },
+          null,
+          3
+        )
+      );
+    }
+    else {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify(
+          {
+            success: false,
+            msg: "Something went wrong please try again"
+          },
+          null,
+          3
+        )
+      );
+    }
+
+
   },
 
 
   async signUpUser(req, res) {
     const { fullname, email, phonenumber, address, password } = req.body;
-    
+
     userModel.findOne({ email: email }).then((result) => {
       if (result == null) {
         bcrypt.hash(password, saltRounds, function (err, hashpassword) {
@@ -147,6 +148,13 @@ module.exports = {
           newuser
             .save()
             .then(() => {
+              var subject = "Account Signup"
+              var descriptionWithHtml = `<h1> Hello <br> ${fullname} </h1>
+               <br> <h3> You have signed up as new user </h3>
+                <p> © 2022 QRpay All Rights Reserved || UNITED KINGDOM  </p>`
+              var responseFromEmail = sendEmail.sendEmail(email, subject, descriptionWithHtml)
+              console.log(responseFromEmail);
+
               res.writeHead(200, { "Content-Type": "application/json" });
               res.end(
                 JSON.stringify(
@@ -189,5 +197,5 @@ module.exports = {
     });
   },
 
-  
+
 };

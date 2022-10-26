@@ -4,7 +4,7 @@ require('dotenv').config()
 module.exports = {
 
 
-    async sendEmail(req, res) {
+    async sendEmail(receipentEmail, Subject, descriptionWithHtml) {
 
         var transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -20,38 +20,15 @@ module.exports = {
         try {
             let responeFromEmail = await transporter.sendMail({
                 from: process.env.EMAIL_SENDER,
-                to: req.body.email,
-                subject: 'Verify',
-                text: 'Hello ',
-                html: '<h1> How are you my friend </h1>'
+                to: receipentEmail,
+                subject: Subject,
+                html: descriptionWithHtml
             })
 
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-                JSON.stringify(
-                    {
-                        success: true,
-                        msg: "Email send successfully",
-                    },
-                    null,
-                    3
-                )
-            );
-
-            console.log(responeFromEmail)
+            return responeFromEmail
         } catch (err) {
             console.log(err)
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-                JSON.stringify(
-                    {
-                        success: false,
-                        msg: "Failed to send email " + err.toString(),
-                    },
-                    null,
-                    3
-                )
-            );
+            return err
         }
     }
 }
