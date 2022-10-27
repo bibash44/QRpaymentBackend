@@ -13,16 +13,22 @@ const UserSchema = new Schema({
 
   phonenumber: {
     type: String,
+    default:""
   },
 
   address: {
     type: String,
-    required: true
+    default:""
   },
 
   password: {
     type: String,
   },
+
+  totalamount:{
+    type: Number,
+    default:0
+  }
 
 });
 

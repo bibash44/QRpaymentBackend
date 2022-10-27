@@ -7,7 +7,7 @@ const sendEmail = require('../AUTH/email')
 module.exports = {
   async signInUser(req, res) {
     const { email, password } = req.body;
-    userModel
+    await userModel
       .findOne({ email: email })
       .then((result) => {
         if (result == null) {
@@ -76,55 +76,85 @@ module.exports = {
       });
   },
 
-  async UpdateOrsignInWithGoogle(req, res) {
-    const payload = req.body;
+  async signInOrSignUpGoogleUser(req, res) {
+    var { fullname, email } = req.body;
 
-    const responseFromDB = await userModel
-      .updateMany({ email: req.body.email }, payload, { upsert: true })
+    if (email.includes("@gmail.com")) {
+      await userModel.findOne({ email: email }).then((result) => {
+        if (result == null) {
+          console.log("userdoesnot exit")
 
-    if (responseFromDB.upsertedCount == 0) {
-      // if means data has been updated
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(
-        JSON.stringify(
-          {
-            success: true,
-            msg: payload.email.includes("@gmail.com") ? "Welcome " + payload.fullname : " updated successfully",
-            data: payload
-          },
-          null,
-          3
-        )
-      );
-    }
-    else if (responseFromDB.upsertedCount == 1) {
-      // it means new user has been registered
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(
-        JSON.stringify(
-          {
-            success: true,
-            msg: payload.email.includes("@gmail.com") ? "Welcome " + payload.fullname : " ",
-            data: payload
-          },
-          null,
-          3
-        )
-      );
+          const newuser = new userModel({
+            fullname: fullname,
+            email: email,
+          });
+
+          newuser
+            .save()
+            .then((registereduserdata) => {
+              var subject = "Account Signup"
+              var descriptionWithHtml = `<h1> Hello <br> ${fullname} </h1>
+                 <br> <h3> You have signed up as new user </h3>
+                  <p> © 2022 QRpay All Rights Reserved || UNITED KINGDOM  </p>`
+              var responseFromEmail = sendEmail.sendEmail(email, subject, descriptionWithHtml)
+              console.log(responseFromEmail);
+
+              res.writeHead(200, { "Content-Type": "application/json" });
+              res.end(
+                JSON.stringify(
+                  {
+                    success: true,
+                    msg: "New user registered successfully",
+                    data: registereduserdata
+                  },
+                  null,
+                  3
+                )
+              );
+            })
+            .catch((e) => {
+              console.log(e);
+              res.end(
+                JSON.stringify(
+                  {
+                    success: false,
+                    msg: "Failed to register new user",
+                  },
+                  null,
+                  3
+                )
+              );
+            });
+        }
+        else {
+          console.log("user exist")
+
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify(
+              {
+                success: true,
+                msg: "User already exist",
+                data: result
+              },
+              null,
+              3
+            )
+          );
+
+
+        }
+      });
+
     }
     else {
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(
-        JSON.stringify(
-          {
-            success: false,
-            msg: "Something went wrong please try again"
-          },
-          null,
-          3
-        )
-      );
+      await this.signUpUser(req, res)
     }
+
+
+
+
+
 
 
   },
@@ -197,5 +227,88 @@ module.exports = {
     });
   },
 
+  async updateUser(req, res) {
+    var { fullname, email, address, phonenumber } = req.body;
+
+    let payload = {
+      fullname: fullname,
+      address: address,
+      phonenumber: phonenumber
+    }
+
+    var responseFromDatabase = await userModel.findOneAndUpdate({ email: email }, payload, { upsert: false, new: true });
+
+
+  },
+
+  async verifyQrData(req, res) {
+    const { receipentid, senderid } = req.body;
+    await userModel
+      .findOne({ _id: receipentid })
+      .then((recipientResult) => {
+        if (recipientResult == null) {
+          console.log("user not found");
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify(
+              {
+                success: false,
+                msg: "Recipient doesnot exist ",
+              },
+              null,
+              3
+            )
+          );
+        } else {
+
+          userModel
+            .findOne({ _id: senderid }).then((senderResult) => {
+              if (senderResult == null) {
+                res.writeHead(200, { "Content-Type": "application/json" });
+                res.end(
+                  JSON.stringify(
+                    {
+                      success: true,
+                      msg: "QR verified and but sender doesnot exist ",
+                    },
+                    null,
+                    3
+                  )
+                );
+              }
+              else{
+                res.writeHead(200, { "Content-Type": "application/json" });
+              res.end(
+                JSON.stringify(
+                  {
+                    success: true,
+                    msg: "QR verified ",
+                    recipientdata: recipientResult,
+                    senderdata: senderResult
+                  },
+                  null,
+                  3
+                )
+              );}
+              
+            })
+
+          
+        }
+      })
+      .catch(function (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify(
+            {
+              success: false,
+              msg: "Failed to retrive data",
+            },
+            null,
+            3
+          )
+        );
+      });
+  },
 
 };
