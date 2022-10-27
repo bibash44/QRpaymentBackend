@@ -76,6 +76,54 @@ module.exports = {
       });
   },
 
+  async getUserData(req, res) {
+    console.log(req.params)
+    await userModel
+      .findOne({ _id: req.params.userid })
+      .then((result) => {
+        if (result == null) {
+          console.log("user not found");
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify(
+              {
+                success: false,
+                msg: "User not found",
+              },
+              null,
+              3
+            )
+          );
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify(
+              {
+                success: true,
+                msg: "User found " + result.fullname,
+                data: result,
+              },
+              null,
+              3
+            )
+          );
+        }
+      })
+      .catch(function (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify(
+            {
+              success: false,
+              msg: "Failed to retrive data",
+            },
+            null,
+            3
+          )
+        );
+      });
+  },
+
   async signInOrSignUpGoogleUser(req, res) {
     var { fullname, email } = req.body;
 
