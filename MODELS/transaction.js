@@ -20,6 +20,10 @@ const transactionSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  remarks: {
+    type: String,
+    required:true
+  },
 
 
 
