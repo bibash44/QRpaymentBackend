@@ -3,7 +3,9 @@ const userModel = require("../MODELS/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const sendEmail = require('../AUTH/email')
+const sendEmail = require('../AUTH/email');
+const { query } = require("express");
+const { $where } = require("../MODELS/transaction");
 
 module.exports = {
 
@@ -50,9 +52,9 @@ module.exports = {
         var paymentMadeEmail = sendEmail.sendEmail(findAndUpdateSenderAmount.email, subjectForSender, descriptionWithHtmlForSender)
 
         var paymentReceivedEmail = sendEmail.sendEmail(findAndUpdateRecipientAmount.email, subjectForRecipient, descriptionWithHtmlForRecipient)
-        
-        console.log("payment Made "+paymentMadeEmail)
-        console.log("payment Received "+paymentReceivedEmail)
+
+        console.log("payment Made " + paymentMadeEmail)
+        console.log("payment Received " + paymentReceivedEmail)
 
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(
@@ -103,12 +105,66 @@ module.exports = {
 
   },
 
-  async getReceivedTransaction(req, res) {
-    const { recipient } = req.params.recipient
+  async getAllTransaction(req, res) {
+    const { userid } = req.params;
 
-    const findReceipent = transactionModel.find({ recipient: recipient })
+    transactionModel.
+      find({ $or: [{ sender: userid }, { recipient: userid }] }).
+      then((result) => {
+        if (result != null) {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify(
+              {
+                success: true,
+                msg: "Successfully retrived transaction",
+                data: result
 
-    print(findReceipent)
+              },
+              null,
+              3
+            ));
+        }
+        else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify(
+              {
+                success: false,
+                msg: "Failed to retrive transaction ",
+                data: result
+
+              },
+              null,
+              3
+            ));
+        }
+      }).catch((err) => {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify(
+            {
+              success: false,
+              msg: "Something went wrong please try again ",
+              
+            },
+            null,
+            3
+          ));
+      })
+  },
+
+  async getSingleTransaction(req, res) {
+    const { transactionid } = req.params;
+
+    transactionModel.
+      findOne({ _id: transactionid }).
+      populate('sender').
+      populate('recipient').
+      then((result) => {
+        res.send(result)
+      })
+
   }
 
 };
