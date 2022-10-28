@@ -27,7 +27,7 @@ const UserSchema = new Schema({
 
   totalamount:{
     type: Number,
-    default:0
+    default: 0.1
   }
 
 });

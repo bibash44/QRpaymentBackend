@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 const transactionSchema = new Schema({
   sender: {
-    type: String,
-    required: true
+    type: Schema.Types.ObjectId,
+    ref: 'User',
   },
 
   recipient: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: 'User'
   },
 
   amount: {
@@ -17,7 +17,7 @@ const transactionSchema = new Schema({
   },
 
   date: {
-    type: String,
+    type: Date,
     default: Date.now
   },
 

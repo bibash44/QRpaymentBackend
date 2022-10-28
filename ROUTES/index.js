@@ -7,5 +7,5 @@ app.get("/", (req, res) => {
 });
 
 app.use('/user', require('./user'))
-// Routes registeration
-// app.use('/user', require('./user'))
+app.use('/transaction', require('./transaction'))
+
