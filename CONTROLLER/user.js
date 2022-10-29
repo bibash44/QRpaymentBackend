@@ -276,15 +276,35 @@ module.exports = {
   },
 
   async updateUser(req, res) {
-    var { fullname, email, address, phonenumber } = req.body;
 
-    let payload = {
-      fullname: fullname,
-      address: address,
-      phonenumber: phonenumber
+    var responseFromDatabase = await userModel.findOneAndUpdate({ _id: req.params.userid }, req.body, { upsert: false, new: true });
+    delete responseFromDatabase['password']
+    if (responseFromDatabase != null) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify(
+          {
+            success: true,
+            msg: "Successfully updated ",
+          },
+          null,
+          3
+        )
+      );
     }
-
-    var responseFromDatabase = await userModel.findOneAndUpdate({ email: email }, payload, { upsert: false, new: true });
+    else {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify(
+          {
+            success: false,
+            msg: "Something went wrong please try again ",
+          },
+          null,
+          3
+        )
+      );
+    }
 
 
   },
@@ -324,24 +344,25 @@ module.exports = {
                   )
                 );
               }
-              else{
+              else {
                 res.writeHead(200, { "Content-Type": "application/json" });
-              res.end(
-                JSON.stringify(
-                  {
-                    success: true,
-                    msg: "QR verified ",
-                    recipientdata: recipientResult,
-                    senderdata: senderResult
-                  },
-                  null,
-                  3
-                )
-              );}
-              
+                res.end(
+                  JSON.stringify(
+                    {
+                      success: true,
+                      msg: "QR verified ",
+                      recipientdata: recipientResult,
+                      senderdata: senderResult
+                    },
+                    null,
+                    3
+                  )
+                );
+              }
+
             })
 
-          
+
         }
       })
       .catch(function (error) {
@@ -359,4 +380,38 @@ module.exports = {
       });
   },
 
+  async sendEmail(req, res) {
+    var email = req.body.email
+    var subject = req.body.subject
+    var descriptionWithHtml = `<h1> ${req.body.description} </h1>`
+    var responseFromEmail = await sendEmail.sendEmail(email, subject, descriptionWithHtml)
+
+    if (responseFromEmail) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify(
+          {
+            success: true,
+            msg: "Email sent successfully, check your inbox ",
+          },
+          null,
+          3
+        )
+      );
+    }
+    else {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify(
+          {
+            success: false,
+            msg: "Something went please , please try again ",
+          },
+          null,
+          3
+        )
+      );
+    }
+
+  }
 };

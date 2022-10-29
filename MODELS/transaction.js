@@ -22,7 +22,6 @@ const transactionSchema = new Schema({
   },
   remarks: {
     type: String,
-    required:true
   },
 
 

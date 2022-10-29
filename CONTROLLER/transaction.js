@@ -49,9 +49,9 @@ module.exports = {
            <h3> Total amount remaining : £${findAndUpdateRecipientAmount.totalamount} <h3>
             <p> © 2022 QRpay All Rights Reserved || UNITED KINGDOM  </p>`
 
-        var paymentMadeEmail = sendEmail.sendEmail(findAndUpdateSenderAmount.email, subjectForSender, descriptionWithHtmlForSender)
+        var paymentMadeEmail = await sendEmail.sendEmail(findAndUpdateSenderAmount.email, subjectForSender, descriptionWithHtmlForSender)
 
-        var paymentReceivedEmail = sendEmail.sendEmail(findAndUpdateRecipientAmount.email, subjectForRecipient, descriptionWithHtmlForRecipient)
+        var paymentReceivedEmail =await sendEmail.sendEmail(findAndUpdateRecipientAmount.email, subjectForRecipient, descriptionWithHtmlForRecipient)
 
         console.log("payment Made " + paymentMadeEmail)
         console.log("payment Received " + paymentReceivedEmail)

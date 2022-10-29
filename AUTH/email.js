@@ -24,11 +24,12 @@ module.exports = {
                 subject: Subject,
                 html: descriptionWithHtml
             })
-
-            return responeFromEmail
+            console.log(responeFromEmail)
+            return true
         } catch (err) {
             console.log(err)
-            return err
+           
+            return false
         }
     }
 }
