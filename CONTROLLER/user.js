@@ -276,8 +276,21 @@ module.exports = {
   },
 
   async updateUser(req, res) {
+    console.log(req.body)
+    var responseFromDatabase;
+    var msg;
+    if ('totalamount' in req.body) {
+      responseFromDatabase = await userModel.findOneAndUpdate({ _id: req.params.userid }, {
+        $inc: { totalamount: +req.body.totalamount }
+      }, { new: true })
+      msg='You have successfully loaded GBP '+req.body.totalamount
+    }
+    else {
+      responseFromDatabase = await userModel.findOneAndUpdate({ _id: req.params.userid }, req.body, { upsert: false, new: true });
+      msg='Profile updated successfully '
+    }
 
-    var responseFromDatabase = await userModel.findOneAndUpdate({ _id: req.params.userid }, req.body, { upsert: false, new: true });
+
     delete responseFromDatabase['password']
     if (responseFromDatabase != null) {
       res.writeHead(200, { "Content-Type": "application/json" });
@@ -285,7 +298,7 @@ module.exports = {
         JSON.stringify(
           {
             success: true,
-            msg: "Successfully updated ",
+            msg: msg
           },
           null,
           3
@@ -309,6 +322,7 @@ module.exports = {
 
   },
 
+ 
   async verifyQrData(req, res) {
     const { receipentid, senderid } = req.body;
     await userModel
