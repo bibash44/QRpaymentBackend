@@ -5,7 +5,8 @@
  const morgan= require('morgan')
  require('dotenv').config()
  const port = process.env.PORT
-
+ var os = require("os");
+ var host= os.hostname()
 // 
 
  require('./DATABASE/dbcon')
@@ -14,4 +15,4 @@
  app.use(bodyParser.urlencoded({ extended: false }))
  app.use(cors())
  app.use(routes)
- app.listen(port, () => console.log(`Server listening on port ${port}!`))
+ app.listen(port, () => console.log(`${host} Server listening on port ${port}!`))
