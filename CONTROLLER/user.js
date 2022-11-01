@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const sendEmail = require('../AUTH/email')
+require('dotenv').config()
 
 module.exports = {
   async signInUser(req, res) {
@@ -27,11 +28,12 @@ module.exports = {
           bcrypt.compare(password, result.password, (err, passwordresult) => {
             if (passwordresult) {
               const token = jwt.sign(
-                { email: passwordresult.email, id: passwordresult.id },
-                "&^&*&&*dsadsa52153sddsaBSdassh6565",
+                { email: result.email, id: result._id },
+                process.env.SECRET_KEY_FOR_TOKEN,
                 { expiresIn: "7d" }
               );
 
+              console.log(passwordresult)
               res.writeHead(200, { "Content-Type": "application/json" });
               res.end(
                 JSON.stringify(
@@ -127,10 +129,11 @@ module.exports = {
   async signInOrSignUpGoogleUser(req, res) {
     var { fullname, email } = req.body;
 
+
     if (email.includes("@gmail.com")) {
       await userModel.findOne({ email: email }).then((result) => {
         if (result == null) {
-          console.log("userdoesnot exit")
+         
 
           const newuser = new userModel({
             fullname: fullname,
@@ -145,7 +148,13 @@ module.exports = {
                  <br> <h3> You have signed up as new user </h3>
                   <p> © 2022 QRpay All Rights Reserved || UNITED KINGDOM  </p>`
               var responseFromEmail = sendEmail.sendEmail(email, subject, descriptionWithHtml)
-              console.log(responseFromEmail);
+
+              const token = jwt.sign(
+                { email: registereduserdata.email, id: registereduserdata._id },
+                process.env.SECRET_KEY_FOR_TOKEN,
+                { expiresIn: "7d" }
+              );
+
 
               res.writeHead(200, { "Content-Type": "application/json" });
               res.end(
@@ -153,6 +162,7 @@ module.exports = {
                   {
                     success: true,
                     msg: "New user registered successfully",
+                    token: token,
                     data: registereduserdata
                   },
                   null,
@@ -177,11 +187,18 @@ module.exports = {
         else {
           console.log("user exist")
 
+          const token = jwt.sign(
+            { email: result.email, id: result._id },
+            process.env.SECRET_KEY_FOR_TOKEN,
+            { expiresIn: "7d" }
+          );
+
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(
             JSON.stringify(
               {
                 success: true,
+                token: token,
                 msg: "User already exist",
                 data: result
               },
@@ -283,11 +300,11 @@ module.exports = {
       responseFromDatabase = await userModel.findOneAndUpdate({ _id: req.params.userid }, {
         $inc: { totalamount: +req.body.totalamount }
       }, { new: true })
-      msg='You have successfully loaded GBP '+req.body.totalamount
+      msg = 'You have successfully loaded GBP ' + req.body.totalamount
     }
     else {
       responseFromDatabase = await userModel.findOneAndUpdate({ _id: req.params.userid }, req.body, { upsert: false, new: true });
-      msg='Profile updated successfully '
+      msg = 'Profile updated successfully '
     }
 
 
@@ -322,7 +339,7 @@ module.exports = {
 
   },
 
- 
+
   async verifyQrData(req, res) {
     const { receipentid, senderid } = req.body;
     await userModel

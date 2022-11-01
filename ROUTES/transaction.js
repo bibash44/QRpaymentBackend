@@ -1,6 +1,7 @@
 const app = module.exports= require('express')()
 const transactionController = require('../CONTROLLER/transaction')
+const middleWare= require('../AUTH/auth')
 
-app.post('/',transactionController.makeTranscation)
-app.get('/getall/:userid',transactionController.getAllTransaction)
-app.get('/getone/:transactionid',transactionController.getSingleTransaction)
+app.post('/',middleWare,  transactionController.makeTranscation)
+app.get('/getall/:userid',middleWare,transactionController.getAllTransaction)
+app.get('/getone/:transactionid',middleWare,transactionController.getSingleTransaction)

@@ -1,14 +1,14 @@
 const jwt = require("jsonwebtoken");
-const config = require("../config/config");
+require('dotenv').config()
 module.exports = (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    const verifyToken = jwt.verify(token, "&^&*&&*dsadsa52153sddsaBSdassh6565");
+    const verifyToken = jwt.verify(token, process.env.SECRET_KEY_FOR_TOKEN);
     req.userData = verifyToken;
     next();
   } catch (e) {
     return res.status(401).json({
-      message: "Unauthorized",
+      msg: "Unauthorized",
     });
   }
 };

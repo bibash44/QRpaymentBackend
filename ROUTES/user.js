@@ -1,10 +1,12 @@
 const app = module.exports= require('express')()
 const userController = require('../CONTROLLER/user')
+const middleWare= require('../AUTH/auth')
 
 app.post('/',userController.signUpUser)
-app.get('/:userid',userController.getUserData)
 app.post('/signin',userController.signInUser)
 app.post('/signinorsignupgoogleuser',userController.signInOrSignUpGoogleUser)
-app.put('/:userid',userController.updateUser)
-app.post('/verifyqrdata',userController.verifyQrData)
-app.post('/sendemail',userController.sendEmail)
+
+app.get('/:userid', middleWare, userController.getUserData)
+app.put('/:userid',middleWare, userController.updateUser)
+app.post('/verifyqrdata', middleWare, userController.verifyQrData)
+app.post('/sendemail',middleWare, userController.sendEmail)
