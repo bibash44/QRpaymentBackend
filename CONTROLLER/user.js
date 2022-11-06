@@ -33,7 +33,7 @@ module.exports = {
                 { expiresIn: "7d" }
               );
 
-              console.log(passwordresult)
+              result.password=null
               res.writeHead(200, { "Content-Type": "application/json" });
               res.end(
                 JSON.stringify(
@@ -78,6 +78,72 @@ module.exports = {
       });
   },
 
+  async signUpUser(req, res) {
+    const { fullname, email, phonenumber, address, password } = req.body;
+
+    userModel.findOne({ email: email }).then((result) => {
+      if (result == null) {
+        bcrypt.hash(password, saltRounds, function (err, hashpassword) {
+          // Store hash in your password DB.
+          const newuser = new userModel({
+            fullname: fullname,
+            email: email,
+            phonenumber: phonenumber,
+            address: address,
+            password: hashpassword,
+          });
+
+          newuser
+            .save()
+            .then(() => {
+              var subject = "Account Signup"
+              var descriptionWithHtml = `<h1> Hello <br> ${fullname} </h1>
+               <br> <h3> You have signed up as new user </h3>
+                <p> © 2022 QRpay All Rights Reserved || UNITED KINGDOM  </p>`
+              var responseFromEmail = sendEmail.sendEmail(email, subject, descriptionWithHtml)
+              console.log(responseFromEmail);
+
+              res.writeHead(200, { "Content-Type": "application/json" });
+              res.end(
+                JSON.stringify(
+                  {
+                    success: true,
+                    msg: "New User registered successfully",
+                  },
+                  null,
+                  3
+                )
+              );
+            })
+            .catch((e) => {
+              console.log(e);
+              res.end(
+                JSON.stringify(
+                  {
+                    success: false,
+                    msg: "Failed to register new user",
+                  },
+                  null,
+                  3
+                )
+              );
+            });
+        });
+      } else {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify(
+            {
+              success: false,
+              msg: "User already exist",
+            },
+            null,
+            3
+          )
+        );
+      }
+    });
+  },
   async getUserData(req, res) {
     console.log(req.params)
     await userModel
@@ -97,6 +163,7 @@ module.exports = {
             )
           );
         } else {
+          result.password=null
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(
             JSON.stringify(
@@ -225,75 +292,8 @@ module.exports = {
   },
 
 
-  async signUpUser(req, res) {
-    const { fullname, email, phonenumber, address, password } = req.body;
-
-    userModel.findOne({ email: email }).then((result) => {
-      if (result == null) {
-        bcrypt.hash(password, saltRounds, function (err, hashpassword) {
-          // Store hash in your password DB.
-          const newuser = new userModel({
-            fullname: fullname,
-            email: email,
-            phonenumber: phonenumber,
-            address: address,
-            password: hashpassword,
-          });
-
-          newuser
-            .save()
-            .then(() => {
-              var subject = "Account Signup"
-              var descriptionWithHtml = `<h1> Hello <br> ${fullname} </h1>
-               <br> <h3> You have signed up as new user </h3>
-                <p> © 2022 QRpay All Rights Reserved || UNITED KINGDOM  </p>`
-              var responseFromEmail = sendEmail.sendEmail(email, subject, descriptionWithHtml)
-              console.log(responseFromEmail);
-
-              res.writeHead(200, { "Content-Type": "application/json" });
-              res.end(
-                JSON.stringify(
-                  {
-                    success: true,
-                    msg: "New User registered successfully",
-                  },
-                  null,
-                  3
-                )
-              );
-            })
-            .catch((e) => {
-              console.log(e);
-              res.end(
-                JSON.stringify(
-                  {
-                    success: false,
-                    msg: "Failed to register new user",
-                  },
-                  null,
-                  3
-                )
-              );
-            });
-        });
-      } else {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(
-          JSON.stringify(
-            {
-              success: false,
-              msg: "User already exist",
-            },
-            null,
-            3
-          )
-        );
-      }
-    });
-  },
 
   async updateUser(req, res) {
-    console.log(req.body)
     var responseFromDatabase;
     var msg;
     if ('totalamount' in req.body) {
@@ -376,6 +376,8 @@ module.exports = {
                 );
               }
               else {
+                recipientResult.password=null
+                senderResult.password=null
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end(
                   JSON.stringify(
@@ -423,7 +425,7 @@ module.exports = {
         JSON.stringify(
           {
             success: true,
-            msg: "Email sent successfully, check your inbox ",
+            msg: "Email sent successfully, check your inbox",
           },
           null,
           3
@@ -436,7 +438,7 @@ module.exports = {
         JSON.stringify(
           {
             success: false,
-            msg: "Something went please , please try again ",
+            msg: "Something went please , please try again",
           },
           null,
           3
