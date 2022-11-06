@@ -146,3 +146,44 @@ describe('USER API TEST', () => {
     });
 
 });
+
+
+describe('TRANSACTION API TEST', () => {
+
+    it('MAKE TRANSACTION - Provided authorization token, sender and receipient id, amount and remarks , it should increase the total amount of recipient and deduct same amount of sender and both of them should receive email notification, else throw error message', async () => {
+        const UserIdToUpdateWallet= '635b06e224ae4c85d82749c9';
+
+        const TestMakeTransActionData = {
+            sender: '636813d250ef2dff1f75214c',
+            recipient: '6367ff93f7c1ea65b3abdca3',
+            amount: 5,
+            remarks: "Testing transaction"
+        }
+
+        const response = await axios.
+            post(baseurl + 'transaction', TestMakeTransActionData, configHeaders)
+
+        expect(response.data).to.have.property('success')
+        expect(response.data).to.have.property('msg')
+        expect(response.data).to.have.property('recipientdata')
+        expect(response.data).to.have.property('senderdata')
+        expect(response.data.msg).to.equal('You have successfully sent GBP '+TestMakeTransActionData.amount +' to '+ response.data.recipientdata.fullname)
+        expect(response.data.success).to.equal(true)
+
+    });
+
+    it('GET USERS TRANSACTIONS LIST FOR STATEMENT - Provided authorization token, userid it should return all the transcation made by particular user, else throw message for transcation not found', async () => {
+        const TestUserIdForRetrivingTranscationList = '636813d250ef2dff1f75214c'
+
+        const response = await axios.
+            get(baseurl + 'transaction/getall/'+TestUserIdForRetrivingTranscationList,  configHeaders)
+
+        expect(response.data).to.have.property('success')
+        expect(response.data).to.have.property('msg')
+        expect(response.data).to.have.property('data')
+        expect(response.data.msg).to.equal('Successfully retrived transaction')
+        expect(response.data.success).to.equal(true)
+
+    });
+
+});

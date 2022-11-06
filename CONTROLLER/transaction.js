@@ -61,7 +61,7 @@ module.exports = {
           JSON.stringify(
             {
               success: true,
-              msg: "You have successfully sent GBP" + amount + " to " + findAndUpdateRecipientAmount.fullname,
+              msg: "You have successfully sent GBP " + amount + " to " + findAndUpdateRecipientAmount.fullname,
               recipientdata: findAndUpdateRecipientAmount,
               senderdata: findAndUpdateSenderAmount
             },
@@ -154,17 +154,5 @@ module.exports = {
       })
   },
 
-  async getSingleTransaction(req, res) {
-    const { transactionid } = req.params;
-
-    transactionModel.
-      findOne({ _id: transactionid }).
-      populate('sender').
-      populate('recipient').
-      then((result) => {
-        res.send(result)
-      })
-
-  }
 
 };

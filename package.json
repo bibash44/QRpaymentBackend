@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --recursive --exit --timeout 3000",
+    "test": "mocha --recursive --exit --timeout 4000",
     "start": "node server.js"
   },
   "repository": {
