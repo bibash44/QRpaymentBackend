@@ -47,7 +47,7 @@ describe('USER API TEST', () => {
     });
 
     it('RETRIVE LOGGED IN USER DATA- Provided authorization token and userid, if user exist it should send user details, else throw msg for data not found', async () => {
-        const TestLoggedInUserData='635b06e224ae4c85d82749c9';
+        const TestLoggedInUserData='6384a0598776257eb2433ba5';
        
         const response = await axios.
             get(baseurl + 'user/'+TestLoggedInUserData, configHeaders)
@@ -61,7 +61,7 @@ describe('USER API TEST', () => {
     });
 
     it('UPDATE USER PROFILE - Provided authorization token, userid and user data, if id exist it should update user details, else throw msg for data not found', async () => {
-        const UserIdToUpdateProfile='635b06e224ae4c85d82749c9';
+        const UserIdToUpdateProfile='6384a0598776257eb2433ba5';
         const TestDataForUserProfileUpdate= {
             fullname: 'Bibash kkkk',
             phonenumber: '4563201258',
@@ -78,7 +78,7 @@ describe('USER API TEST', () => {
     });
 
     it('LOAD USER WALLET - Provided authorization token, userid and amount to load, if id exist it should update and sumup the total amount of user, else throw error msg ', async () => {
-        const UserIdToUpdateWallet= '635b06e224ae4c85d82749c9';
+        const UserIdToUpdateWallet= '6384a0598776257eb2433ba5';
         const TestDataToUpdateWallet={
             totalamount: '15.6'
         }
@@ -95,8 +95,8 @@ describe('USER API TEST', () => {
     it('VERIFY QR CODE - Provided authorization token, sender id and recipient id, if both sender and recipient exist, it should return qr verified message else throw msg for either sender or recipient doesnot exist or 500 status code error', async () => {
      
         const TestDataToVerifyQRCode={
-            receipentid: '635b06e224ae4c85d82749c9',
-            senderid:'635b091024ae4c85d82749d7'
+            receipentid: '6384a0598776257eb2433ba5',
+            senderid:'6383ea4b88c8d349afa10783'
         }
         const response = await axios.
             post(baseurl + 'user/verifyqrdata', TestDataToVerifyQRCode, configHeaders)
@@ -151,11 +151,11 @@ describe('USER API TEST', () => {
 describe('TRANSACTION API TEST', () => {
 
     it('MAKE TRANSACTION - Provided authorization token, sender and receipient id, amount and remarks , it should increase the total amount of recipient and deduct same amount of sender and both of them should receive email notification, else throw error message', async () => {
-        const UserIdToUpdateWallet= '635b06e224ae4c85d82749c9';
+        const UserIdToUpdateWallet= '6384a0598776257eb2433ba5';
 
         const TestMakeTransActionData = {
-            sender: '636813d250ef2dff1f75214c',
-            recipient: '6367ff93f7c1ea65b3abdca3',
+            sender: '6384a0598776257eb2433ba5',
+            recipient: '6383ea4b88c8d349afa10783',
             amount: 5,
             remarks: "Testing transaction"
         }
